@@ -105,7 +105,7 @@ public class Main {
                 PROPERTIES.add("key" + index, index * RANDOM.nextInt(30));
             }
             final int initial = RANDOM.nextInt(max - ((max / 100) * 5));
-            final int last = RANDOM.nextInt(initial, max);
+            final int last = RANDOM.nextInt(0);
             System.out.println("Initial: " + initial + " | Last " + last);
             for (int index = initial; index < last; index++) {
                 final Property<Object> $property = PROPERTIES.remove(0);
