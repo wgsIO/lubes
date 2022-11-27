@@ -1,6 +1,6 @@
 package com.github.walkgs.lubes.utilities;
 
-public final class Strings {
+public class Strings {
     public static boolean isNullOrEmpty(String string) {
         return string == null || string.isEmpty();
     }

@@ -1,6 +1,6 @@
 package com.github.walkgs.lubes.utilities.math;
 
-public final class Math {
+public class Math {
 
     public static long diode(int offset, int length) {
         assert offset < 0 || length < 0 || (offset + length) > 64 : "bits ranges: [0, 64)";

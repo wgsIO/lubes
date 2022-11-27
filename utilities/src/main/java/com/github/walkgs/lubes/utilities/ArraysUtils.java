@@ -3,7 +3,7 @@ package com.github.walkgs.lubes.utilities;
 import java.lang.reflect.Array;
 import java.util.Objects;
 
-public final class ArraysUtils {
+public class ArraysUtils {
 
     public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
     public static final Class[] EMPTY_CLASS_ARRAY = new Class[0];

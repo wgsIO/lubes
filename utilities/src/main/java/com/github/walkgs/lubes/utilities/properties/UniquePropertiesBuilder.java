@@ -4,7 +4,7 @@ import com.github.walkgs.lubes.utilities.Applicable;
 import lombok.Getter;
 
 @Getter
-public final class UniquePropertiesBuilder<T> implements PropertiesBuilder<T>, Applicable<UniquePropertiesBuilder<T>> {
+public class UniquePropertiesBuilder<T> implements PropertiesBuilder<T>, Applicable<UniquePropertiesBuilder<T>> {
 
     private Object key;
     private T value;
