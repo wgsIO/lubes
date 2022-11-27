@@ -1,0 +1,21 @@
+### IntelliJ
+.idea
+*.iml
+out
+gen
+jars
+/jars/*
+
+### Gradle
+.gradle
+
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# Project exclude paths
+/.gradle/
+/build/
+/build/classes/java/main/

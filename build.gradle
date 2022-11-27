@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+}
+
+def projectGroup = 'com.github.walkgs.lubes'
+
+group = projectGroup
+version '1.0-SNAPSHOT'
+
+dependencies {
+    compileOnly subprojects
+}
+
+allprojects {
+    group = projectGroup
+
+    afterEvaluate {
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            compileOnly 'org.projectlombok:lombok:1.18.24'
+            annotationProcessor 'org.projectlombok:lombok:1.18.24'
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(Jar) {
+        setBuildDir(file("$rootDir/build/"))
+    }
+
+}
