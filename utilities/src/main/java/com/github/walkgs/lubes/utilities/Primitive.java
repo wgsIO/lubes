@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Primitive {
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAP = new HashMap<Class<?>, Class<?>>() {{
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAP = new HashMap<>() {{
         put(boolean.class, Boolean.class);
         put(byte.class, Byte.class);
         put(char.class, Character.class);
