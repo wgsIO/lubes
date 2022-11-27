@@ -1,6 +1,5 @@
 package com.github.walkgs.lubes.utilities.properties;
 
-import java.util.Collection;
 import java.util.Set;
 
 public interface Properties extends Iterable<Property<?>> {

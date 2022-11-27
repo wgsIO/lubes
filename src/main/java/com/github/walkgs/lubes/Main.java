@@ -1,7 +1,6 @@
 package com.github.walkgs.lubes;
 
 import com.github.walkgs.lubes.utilities.ArraysUtils;
-import com.github.walkgs.lubes.utilities.Strings;
 import com.github.walkgs.lubes.utilities.identifiers.SnowIdentifier;
 import com.github.walkgs.lubes.utilities.math.BinaryPadding;
 import com.github.walkgs.lubes.utilities.math.HexPadding;

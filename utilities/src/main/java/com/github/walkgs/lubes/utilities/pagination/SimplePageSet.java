@@ -3,7 +3,6 @@ package com.github.walkgs.lubes.utilities.pagination;
 import com.github.walkgs.lubes.utilities.ArraysUtils;
 import com.github.walkgs.lubes.utilities.exceptions.ArrayIndexLimitException;
 import com.github.walkgs.lubes.utilities.exceptions.KeyAlreadyExistsException;
-import com.github.walkgs.lubes.utilities.properties.Property;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

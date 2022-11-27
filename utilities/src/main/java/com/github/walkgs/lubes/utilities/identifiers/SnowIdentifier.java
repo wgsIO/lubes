@@ -4,7 +4,6 @@ import com.github.walkgs.lubes.utilities.Applicable;
 import com.github.walkgs.lubes.utilities.math.Math;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class SnowIdentifier implements Applicable<SnowIdentifier> {

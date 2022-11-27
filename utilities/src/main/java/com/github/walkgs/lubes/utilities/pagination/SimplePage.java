@@ -3,11 +3,13 @@ package com.github.walkgs.lubes.utilities.pagination;
 import com.github.walkgs.lubes.utilities.ArraysUtils;
 import com.github.walkgs.lubes.utilities.exceptions.ArrayIndexLimitException;
 import com.github.walkgs.lubes.utilities.exceptions.KeyAlreadyExistsException;
-import com.github.walkgs.lubes.utilities.properties.Property;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class SimplePage<T> implements Page<T> {
