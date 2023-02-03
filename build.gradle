@@ -2,27 +2,20 @@ plugins {
     id 'java'
 }
 
-def projectGroup = 'com.github.walkgs.lubes'
-
-group = projectGroup
+group 'com.github.walkgs.lubes'
 version '1.0-SNAPSHOT'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    compileOnly subprojects
+    implementation project(":utilities")
+    implementation 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 }
 
 allprojects {
-    group = projectGroup
-
-    afterEvaluate {
-        repositories {
-            mavenCentral()
-        }
-        dependencies {
-            compileOnly 'org.projectlombok:lombok:1.18.24'
-            annotationProcessor 'org.projectlombok:lombok:1.18.24'
-        }
-    }
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'

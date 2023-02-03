@@ -6,7 +6,7 @@ gen
 jars
 /jars/*
 
-/src/main/java/com/github/walkgs/lubes/Main.java
+/src/main/java/com/github/walkgs/lubes/com.github.walkgs.lubes.Main.java
 
 ### Gradle
 .gradle

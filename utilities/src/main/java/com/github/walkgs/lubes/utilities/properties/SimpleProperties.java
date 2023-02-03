@@ -162,7 +162,8 @@ public class SimpleProperties implements Properties, Applicable<SimpleProperties
 
     @Override
     public Set<Property<?>> all() {
-        return Set.<Property<?>>of(this.properties);
+        final Stream<Property<?>> stream = Arrays.stream(properties);
+        return stream.collect(Collectors.toSet());
     }
 
     @Override

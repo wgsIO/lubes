@@ -6,10 +6,9 @@ import com.github.walkgs.lubes.utilities.exceptions.KeyAlreadyExistsException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class SimplePageSet<T> implements PageSet<T> {
@@ -40,7 +39,7 @@ public class SimplePageSet<T> implements PageSet<T> {
 
     @Override
     public Set<Page<T>> getPages() {
-        return Set.of(pages);
+        return Stream.of(pages).collect(Collectors.toSet());
     }
 
     @Override

@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ZeroPadding {
 
-    BASE_64("0".repeat(64)),
-    BASE_32("0".repeat(32)),
-    BASE_16("0".repeat(16));
+    BASE_64("0000000000000000000000000000000000000000000000000000000000000000"),
+    BASE_32("00000000000000000000000000000000"),
+    BASE_16("0000000000000000");
 
     private final String value;
 
