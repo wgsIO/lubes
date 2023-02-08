@@ -28,16 +28,16 @@ public class SimpleInjector implements Injector {
     @Override
     public <T> T inject(Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
 
-        T instance = injectConstructor(clazz);
+        T instance = injectViaConstructor(clazz);
 
-        injectFields(instance, clazz);
+        injectViaFields(instance, clazz);
 
         //viaFields(instance, clazz)
 
-        return injectMethods(instance, clazz);
+        return injectViaMethods(instance, clazz);
     }
 
-    public <T> T injectConstructor(Class<?> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    public <T> T injectViaConstructor(Class<?> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         final List<Constructor<?>> constructors = Constructors.create().findAllAndMakeThemAccessible(ConstructorCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz).stream().sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         if (constructors.size() == 0)
             return (T) clazz.newInstance();
@@ -47,24 +47,36 @@ public class SimpleInjector implements Injector {
         }
     }
 
-    public <T> T injectMethods(T instance, Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public <T> T injectViaMethods(T instance, Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         final Collection<Method> methods = Methods.create().findAllAndMakeThemAccessible(MethodCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz).stream().sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         for (Method method : methods) {
-            method.invoke(instance, getParameterInstances(method.getParameterTypes(), method.getParameterAnnotations()));
-            method.setAccessible(false);
+            injectAtMethod(instance, method);
         }
         return instance;
     }
 
-    public <T> T injectFields(T instance, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    public <T> void injectAtMethod(T instance, Method method) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+        if (!method.isAccessible())
+            method.setAccessible(true);
+        method.invoke(instance, getParameterInstances(method.getParameterTypes(), method.getParameterAnnotations()));
+        method.setAccessible(false);
+    }
+
+    public <T> T injectViaFields(T instance, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         final Collection<Field> fields = Fields.create().findAllAndMakeThemAccessible(FieldCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz);
         for (Field field : fields) {
-            final Name annotation = field.getAnnotation(Name.class);
-            final String name = annotation != null ? annotation.value() : "";
-            field.set(instance, field.isAnnotationPresent(Singleton.class) ? getSingleton(name, field.getType()) : inject(syringe.getInjectable(name, field.getType())));
-            field.setAccessible(false);
+            injectAtField(instance, field);
         }
         return instance;
+    }
+
+    public <T> void injectAtField(T instance, Field field) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        if (!field.isAccessible())
+            field.setAccessible(true);
+        final Name annotation = field.getAnnotation(Name.class);
+        final String name = annotation != null ? annotation.value() : "";
+        field.set(instance, field.isAnnotationPresent(Singleton.class) ? getSingleton(name, field.getType()) : inject(syringe.getInjectable(name, field.getType())));
+        field.setAccessible(false);
     }
 
     public <T> T getSingleton(String name, Class<?> type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
