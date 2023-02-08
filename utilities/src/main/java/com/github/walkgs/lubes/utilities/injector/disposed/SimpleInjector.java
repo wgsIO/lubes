@@ -28,14 +28,16 @@ public class SimpleInjector implements Injector {
     @Override
     public <T> T inject(Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
 
-        T instance = viaConstructor(clazz);
+        T instance = injectConstructor(clazz);
 
-        viaFields(instance, clazz);
+        injectFields(instance, clazz);
 
-        return viaMethods(viaFields(instance, clazz), clazz);
+        //viaFields(instance, clazz)
+
+        return injectMethods(instance, clazz);
     }
 
-    private <T> T viaConstructor(Class<?> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    public <T> T injectConstructor(Class<?> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         final List<Constructor<?>> constructors = Constructors.create().findAllAndMakeThemAccessible(ConstructorCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz).stream().sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         if (constructors.size() == 0)
             return (T) clazz.newInstance();
@@ -45,7 +47,7 @@ public class SimpleInjector implements Injector {
         }
     }
 
-    private <T> T viaMethods(T instance, Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public <T> T injectMethods(T instance, Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         final Collection<Method> methods = Methods.create().findAllAndMakeThemAccessible(MethodCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz).stream().sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         for (Method method : methods) {
             method.invoke(instance, getParameterInstances(method.getParameterTypes(), method.getParameterAnnotations()));
@@ -54,7 +56,7 @@ public class SimpleInjector implements Injector {
         return instance;
     }
 
-    private <T> T viaFields(T instance, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    public <T> T injectFields(T instance, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         final Collection<Field> fields = Fields.create().findAllAndMakeThemAccessible(FieldCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz);
         for (Field field : fields) {
             final Name annotation = field.getAnnotation(Name.class);
