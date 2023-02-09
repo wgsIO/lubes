@@ -27,7 +27,7 @@ public class SimplePage<T> implements Page<T> {
 
     @Override
     public int add(T value) {
-       final int lastLength = objects.length;
+        final int lastLength = objects.length;
         if (capacity != 0 && lastLength >= capacity)
             throw new ArrayIndexLimitException();
         for (final Object object : getObjects()) {
@@ -76,9 +76,8 @@ public class SimplePage<T> implements Page<T> {
                 if (obj == null)
                     return index;
                 continue;
-            } else
-                if (object.equals(obj))
-                    return index;
+            } else if (object.equals(obj))
+                return index;
         }
         return -1;
     }
@@ -110,7 +109,7 @@ public class SimplePage<T> implements Page<T> {
         final Set<T> set = new HashSet<>();
         for (Object object : objects)
             //if (object != null)
-                set.add((T) object);
+            set.add((T) object);
         return set;
     }
 
@@ -121,7 +120,7 @@ public class SimplePage<T> implements Page<T> {
 
     @Override
     public String toString() {
-        return "Page[Capacity: "+ capacity +", Values: "+ Arrays.toString(objects) +"]";
+        return "Page[Capacity: " + capacity + ", Values: " + Arrays.toString(objects) + "]";
     }
 
 }

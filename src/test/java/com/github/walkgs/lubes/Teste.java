@@ -2,6 +2,7 @@ package com.github.walkgs.lubes;
 
 import com.github.walkgs.lubes.utilities.injector.annotation.Inject;
 import com.github.walkgs.lubes.utilities.injector.annotation.Singleton;
+
 public class Teste {
 
 

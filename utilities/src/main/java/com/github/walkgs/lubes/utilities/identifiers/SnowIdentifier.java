@@ -29,6 +29,13 @@ public class SnowIdentifier implements Applicable<SnowIdentifier> {
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
+    public SnowIdentifier(long datacenterId, long workerId) {
+        assert (datacenterId > MAX_DATACENTER_ID || datacenterId < 0) : new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", MAX_DATACENTER_ID));
+        assert (workerId > MAX_WORKER_ID || workerId < 0) : new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", MAX_WORKER_ID));
+        this.datacenterId = datacenterId;
+        this.workerId = workerId;
+    }
+
     public synchronized long nextId() {
         long currentTimestamp = System.currentTimeMillis();
         assert !(currentTimestamp < lastTimestamp) : new IllegalArgumentException(String.format("Clock moved backwards. Refusing to generate id for %d milliseconds", lastTimestamp - currentTimestamp));
@@ -40,13 +47,6 @@ public class SnowIdentifier implements Applicable<SnowIdentifier> {
             sequence = 0;
         lastTimestamp = currentTimestamp;
         return ((currentTimestamp - EPOCH) << TIMESTAMP_SHIFT) | (datacenterId << DATACENTER_ID_SHIFT) | (workerId << WORKER_ID_SHIFT) | sequence;
-    }
-
-    public SnowIdentifier(long datacenterId, long workerId) {
-        assert (datacenterId > MAX_DATACENTER_ID || datacenterId < 0) :  new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", MAX_DATACENTER_ID));
-        assert (workerId > MAX_WORKER_ID || workerId < 0) : new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", MAX_WORKER_ID));
-        this.datacenterId = datacenterId;
-        this.workerId = workerId;
     }
 
     public long getWaitCount() {

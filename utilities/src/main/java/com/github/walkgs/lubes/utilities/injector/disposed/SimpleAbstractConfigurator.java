@@ -48,6 +48,7 @@ public abstract class SimpleAbstractConfigurator implements Configurator {
                 elementList.add(queue.name, queue.clazz);
             }
         }
+        queues.clear();
     }
 
 }

@@ -5,6 +5,7 @@ import com.github.walkgs.lubes.utilities.injector.annotation.Inject;
 import com.github.walkgs.lubes.utilities.injector.annotation.Name;
 import com.github.walkgs.lubes.utilities.injector.annotation.Singleton;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.burningwave.core.classes.*;
 
 import java.io.IOException;
@@ -14,16 +15,25 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
+@Getter
 @AllArgsConstructor
 public class SimpleInjector implements Injector {
 
     private static final SimplePriorityComparator PRIORITY_COMPARATOR = new SimplePriorityComparator();
 
     private Syringe syringe;
+    private Collection<Injector> parents;
+
+    public SimpleInjector(Syringe syringe) {
+        this.syringe = syringe;
+        this.parents = new ConcurrentLinkedQueue<>();
+    }
 
     @Override
     public <T> T inject(Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -79,9 +89,43 @@ public class SimpleInjector implements Injector {
         field.setAccessible(false);
     }
 
-    public <T> T getSingleton(String name, Class<?> type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public <T> T getSingletonB(String name, Class<?> type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         final Storage storage = syringe.getConfigurator().getStorage();
         final Map<Class<?>, ElementList<Object>> singletons = storage.getSingletons();
+        ElementList<Object> elementList = singletons.get(type);
+        if (elementList == null)
+            elementList = new SimpleElementList<>().apply(it -> singletons.put(type, it));
+        final Element<Object> element = elementList.get(name);
+        if (element != null)
+            return (T) element.get();
+        final T instance = inject(syringe.getInjectable(name, type));
+        elementList.add(name, instance);
+        return instance;
+    }
+
+
+    public <T> T getSingleton(String name, Class<?> type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        final HashSet<Injector> injectors = new HashSet<>();
+        injectors.add(this);
+        getParentsInjectors(this, injectors);
+        Map<Class<?>, ElementList<Object>> map = null;
+        for (Injector injector : injectors) {
+            final Syringe syringe = injector.getSyringe();
+            final Configurator configurator = syringe.getConfigurator();
+            final Storage storage = configurator.getStorage();
+            final Map<Class<?>, ElementList<Object>> singletons = storage.getSingletons();
+            final ElementList<Object> elementList = singletons.get(type);
+            if (elementList == null) {
+                if (map == null)
+                    map = singletons;
+                continue;
+            }
+            final Element<Object> element = elementList.get(name);
+            if (element == null)
+                continue;
+            return (T) element.get();
+        }
+        final Map<Class<?>, ElementList<Object>> singletons = map;
         ElementList<Object> elementList = singletons.get(type);
         if (elementList == null)
             elementList = new SimpleElementList<>().apply(it -> singletons.put(type, it));
@@ -108,17 +152,42 @@ public class SimpleInjector implements Injector {
 
     private boolean containsSingleton(Annotation[] annotations) {
         for (Annotation annotation : annotations) {
-            System.out.println("Achado: " + annotation.toString());
             if (annotation instanceof Singleton)
                 return true;
         }
         return false;
     }
 
+    private void getParentsInjectors(Injector injector, HashSet<Injector> set) {
+        for (Injector parent : injector.getParents()) {
+            if (set.contains(parent))
+                continue;
+            set.add(parent);
+            getParentsInjectors(parent, set);
+        }
+    }
+
     @Override
     public void close() throws IOException {
+        for (Injector parent : parents)
+            removeParent(parent);
         syringe.close();
         syringe = null;
     }
+
+    @Override
+    public void addParent(Injector parenting) {
+        this.parents.add(parenting);
+        parenting.getParents().add(this);
+        syringe.addParent(parenting.getSyringe());
+    }
+
+    @Override
+    public void removeParent(Injector parenting) {
+        this.parents.remove(parenting);
+        parenting.getParents().remove(this);
+        syringe.removeParent(parenting.getSyringe());
+    }
+
 
 }

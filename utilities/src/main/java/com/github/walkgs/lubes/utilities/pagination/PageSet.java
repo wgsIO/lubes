@@ -15,6 +15,7 @@ public interface PageSet<T> extends Applicable<PageSet<T>>, Iterable<Page<T>> {
     Set<Page<T>> getPages();
 
     Page<T> addPage();
+
     int addPage(Page<T> page);
 
     int removePage(Page<T> page);

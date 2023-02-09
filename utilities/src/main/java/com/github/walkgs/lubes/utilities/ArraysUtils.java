@@ -33,8 +33,7 @@ public class ArraysUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T[] remove(T[] array, int index)
-    {
+    public static <T> T[] remove(T[] array, int index) {
         final int length = array.length;
         final Class<? extends Object[]> clazz = array.getClass();
         final T[] newArray = (T[]) Array.newInstance(clazz.getComponentType(), length - 1);

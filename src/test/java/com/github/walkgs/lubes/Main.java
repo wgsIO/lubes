@@ -34,8 +34,6 @@ public class Main {
     public static void main(String[] args) {
 
 
-
-
         Object[] objects = new Object[10];
         int max3 = 10;
         for (int index = 0; index < max3; index++) {
@@ -73,22 +71,22 @@ public class Main {
         if (true)
             return;
 
-            final Page<String> page = new SimplePage<>();
-            int max2 = 10;
-            for (int index = 0; index < max2; index++) {
-                //page.add("key" + RANDOM.nextInt(30) + index * RANDOM.nextInt(30));
-                page.add("key" + index);
-                System.out.println("Added Values: " + "key" + index);
-            }
-            page.remove(3);
-            System.out.println("Page Values: " + page);
+        final Page<String> page = new SimplePage<>();
+        int max2 = 10;
+        for (int index = 0; index < max2; index++) {
+            //page.add("key" + RANDOM.nextInt(30) + index * RANDOM.nextInt(30));
+            page.add("key" + index);
+            System.out.println("Added Values: " + "key" + index);
+        }
+        page.remove(3);
+        System.out.println("Page Values: " + page);
 
         if (true)
             return;
 
         System.out.println("Epoch: " + System.currentTimeMillis());
         for (int i = 0; i < 10; i++)
-            System.out.println("ID: " + new SnowIdentifier(i,5).nextId());
+            System.out.println("ID: " + new SnowIdentifier(i, 5).nextId());
 
         System.out.println("Padding 64: " + ZeroPadding.BASE_64);
         System.out.println("Padding 32: " + ZeroPadding.BASE_32);

@@ -17,9 +17,8 @@ public class SimpleProperties implements Properties, Applicable<SimpleProperties
 
     private static final int DEFAULT_SIZE = 0;
     private static final int DEFAULT_LIMIT = 0;
-
-    private Property[] properties = new Property[DEFAULT_SIZE];
     private final int limit;
+    private Property[] properties = new Property[DEFAULT_SIZE];
 
     public SimpleProperties() {
         limit = DEFAULT_LIMIT;
