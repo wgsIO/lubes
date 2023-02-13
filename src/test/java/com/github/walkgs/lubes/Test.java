@@ -32,4 +32,8 @@ public class Test {
         }
     }
 
+    public void oi() {
+
+    }
+
 }
