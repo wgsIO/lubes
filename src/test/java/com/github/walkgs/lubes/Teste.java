@@ -7,7 +7,7 @@ public class Teste {
 
 
     @Inject
-    @Singleton
+    //@Singleton
     public Datas data;
 
     /*

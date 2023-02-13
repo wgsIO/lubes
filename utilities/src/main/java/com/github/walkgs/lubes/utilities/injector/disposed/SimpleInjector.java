@@ -4,9 +4,11 @@ import com.github.walkgs.lubes.utilities.injector.*;
 import com.github.walkgs.lubes.utilities.injector.annotation.Inject;
 import com.github.walkgs.lubes.utilities.injector.annotation.Name;
 import com.github.walkgs.lubes.utilities.injector.annotation.Singleton;
+import com.github.walkgs.lubes.utilities.seekers.Constructors;
+import com.github.walkgs.lubes.utilities.seekers.Fields;
+import com.github.walkgs.lubes.utilities.seekers.Methods;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.burningwave.core.classes.*;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -14,10 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> T injectViaConstructor(Class<?> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        final List<Constructor<?>> constructors = Constructors.create().findAllAndMakeThemAccessible(ConstructorCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz).stream().sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
+        final List<Constructor<?>> constructors = Constructors.find(clazz).filter(it -> it.isAnnotationPresent(Inject.class)).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         if (constructors.size() == 0)
             return (T) clazz.newInstance();
         else {
@@ -58,7 +57,7 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> T injectViaMethods(T instance, Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        final Collection<Method> methods = Methods.create().findAllAndMakeThemAccessible(MethodCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz).stream().sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
+        final Collection<Method> methods = Methods.find(clazz).filter(it -> it.isAnnotationPresent(Inject.class)).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         for (Method method : methods) {
             injectAtMethod(instance, method);
         }
@@ -73,7 +72,7 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> T injectViaFields(T instance, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        final Collection<Field> fields = Fields.create().findAllAndMakeThemAccessible(FieldCriteria.forEntireClassHierarchy().allThoseThatMatch(it -> it.isAnnotationPresent(Inject.class)), clazz);
+        final Collection<Field> fields = Fields.find(clazz).filter(it -> it.isAnnotationPresent(Inject.class)).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         for (Field field : fields) {
             injectAtField(instance, field);
         }
