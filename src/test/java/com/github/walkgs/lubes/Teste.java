@@ -13,7 +13,13 @@ public class Teste {
 
     @Inject
     @Singleton
-    public Testes2 testes;
+    private Testes2 testestets;
+
+    public Testes2 getTestestets() {
+        return testestets;
+    }
+
+
     /*
     @Inject
     public com.github.walkgs.lubes.Teste(@Singleton com.github.walkgs.lubes.Datas data) {

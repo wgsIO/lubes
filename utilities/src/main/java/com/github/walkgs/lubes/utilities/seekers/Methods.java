@@ -2,10 +2,6 @@ package com.github.walkgs.lubes.utilities.seekers;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Methods {

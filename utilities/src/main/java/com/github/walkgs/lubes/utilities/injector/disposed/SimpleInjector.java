@@ -12,12 +12,13 @@ import lombok.Getter;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.lang.reflect.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Getter
@@ -47,7 +48,7 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> T injectViaConstructor(Class<?> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        final List<Constructor<?>> constructors = Constructors.find(clazz).filter(it -> it.isAnnotationPresent(Inject.class)).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
+        final List<Constructor<?>> constructors = Constructors.findDeclared(clazz).filter(setAccessibleAndFilter()).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         if (constructors.size() == 0)
             return (T) clazz.newInstance();
         else {
@@ -57,7 +58,7 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> T injectViaMethods(T instance, Class<?> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        final Collection<Method> methods = Methods.find(clazz).filter(it -> it.isAnnotationPresent(Inject.class)).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
+        final Collection<Method> methods = Methods.findDeclared(clazz).filter(setAccessibleAndFilter()).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         for (Method method : methods) {
             injectAtMethod(instance, method);
         }
@@ -65,14 +66,12 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> void injectAtMethod(T instance, Method method) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        if (!method.isAccessible())
-            method.setAccessible(true);
         method.invoke(instance, getParameterInstances(method.getParameterTypes(), method.getParameterAnnotations()));
         method.setAccessible(false);
     }
 
     public <T> T injectViaFields(T instance, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        final Collection<Field> fields = Fields.find(clazz).filter(it -> it.isAnnotationPresent(Inject.class)).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
+        final Collection<Field> fields = Fields.findDeclared(clazz).filter(setAccessibleAndFilter()).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         for (Field field : fields) {
             injectAtField(instance, field);
         }
@@ -80,8 +79,6 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> void injectAtField(T instance, Field field) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        if (!field.isAccessible())
-            field.setAccessible(true);
         final Name annotation = field.getAnnotation(Name.class);
         final String name = annotation != null ? annotation.value() : Element.DEFAULT_NAME;
         field.set(instance, field.isAnnotationPresent(Singleton.class) ? getSingleton(name, field.getType()) : inject(syringe.getInjectable(name, field.getType())));
@@ -171,6 +168,18 @@ public class SimpleInjector implements Injector {
         this.parents.remove(parenting);
         parenting.getParents().remove(this);
         syringe.removeParent(parenting.getSyringe());
+    }
+
+    private Predicate<AnnotatedElement> setAccessibleAndFilter() {
+        return it -> {
+            final boolean isInject = it.isAnnotationPresent(Inject.class);
+            if (isInject) {
+                final AccessibleObject object = (AccessibleObject) it;
+                if (!object.isAccessible())
+                    object.setAccessible(true);
+            }
+            return isInject;
+        };
     }
 
 }

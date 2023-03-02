@@ -1,7 +1,6 @@
 package com.github.walkgs.lubes.utilities.injector.disposed;
 
 import com.github.walkgs.lubes.utilities.Applicable;
-import com.github.walkgs.lubes.utilities.Strings;
 import com.github.walkgs.lubes.utilities.exceptions.KeyAlreadyExistsException;
 import com.github.walkgs.lubes.utilities.injector.Element;
 import com.github.walkgs.lubes.utilities.injector.ElementList;
