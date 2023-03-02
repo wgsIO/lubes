@@ -83,25 +83,10 @@ public class SimpleInjector implements Injector {
         if (!field.isAccessible())
             field.setAccessible(true);
         final Name annotation = field.getAnnotation(Name.class);
-        final String name = annotation != null ? annotation.value() : "";
+        final String name = annotation != null ? annotation.value() : Element.DEFAULT_NAME;
         field.set(instance, field.isAnnotationPresent(Singleton.class) ? getSingleton(name, field.getType()) : inject(syringe.getInjectable(name, field.getType())));
         field.setAccessible(false);
     }
-
-    public <T> T getSingletonB(String name, Class<?> type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        final Storage storage = syringe.getConfigurator().getStorage();
-        final Map<Class<?>, ElementList<Object>> singletons = storage.getSingletons();
-        ElementList<Object> elementList = singletons.get(type);
-        if (elementList == null)
-            elementList = new SimpleElementList<>().apply(it -> singletons.put(type, it));
-        final Element<Object> element = elementList.get(name);
-        if (element != null)
-            return (T) element.get();
-        final T instance = inject(syringe.getInjectable(name, type));
-        elementList.add(name, instance);
-        return instance;
-    }
-
 
     public <T> T getSingleton(String name, Class<?> type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         final HashSet<Injector> injectors = new HashSet<>();
@@ -141,7 +126,7 @@ public class SimpleInjector implements Injector {
         int i = 0;
         for (Class<?> type : types) {
             final Name annotation = type.getAnnotation(Name.class);
-            final String name = annotation != null ? annotation.value() : "";
+            final String name = annotation != null ? annotation.value() : Element.DEFAULT_NAME;
             final boolean isSingleton = containsSingleton(annotations != null ? annotations[i] : type.getAnnotations());
             arguments[i] = isSingleton ? getSingleton(name, type) : inject(syringe.getInjectable(name, type));
             i++;
@@ -187,6 +172,5 @@ public class SimpleInjector implements Injector {
         parenting.getParents().remove(this);
         syringe.removeParent(parenting.getSyringe());
     }
-
 
 }

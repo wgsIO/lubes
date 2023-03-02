@@ -25,8 +25,10 @@ public class Test {
             final Teste inject = injector2.inject(Teste.class);
             ((Data) inject.data).text = "porra";
             System.out.println("Foi " + inject.data.getText());
+            System.out.println("Text:  " + inject.testes.getText());
             final Teste inject2 = injector.inject(Teste.class);
             System.out.println("Foi2 " + inject2.data.getText());
+            System.out.println("Text2:  " + inject2.testes.getText());
         } catch (Exception e) {
             e.printStackTrace();
         }

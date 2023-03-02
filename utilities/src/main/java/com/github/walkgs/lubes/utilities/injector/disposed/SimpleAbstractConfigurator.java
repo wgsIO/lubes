@@ -14,20 +14,25 @@ public abstract class SimpleAbstractConfigurator implements Configurator {
     private final SimpleStorage storage = new SimpleStorage();
     private final Set<ElementBinder> queues = new HashSet<>();
 
-    public ElementBinder bind(Object instance) {
+    protected ElementBinder bind(Object instance) {
         return new ElementBinder(Element.DEFAULT_NAME, instance, instance.getClass()).apply(it -> queues.add(it));
     }
 
-    public ElementBinder bind(Class<?> clazz) {
+    protected ElementBinder bind(Class<?> clazz) {
         return new ElementBinder(Element.DEFAULT_NAME, null, clazz).apply(it -> queues.add(it));
     }
 
-    public ElementBinder bind(String name, Object instance) {
+    protected ElementBinder bind(String name, Object instance) {
         return new ElementBinder(name, instance, instance.getClass()).apply(it -> queues.add(it));
     }
 
-    public ElementBinder bind(String name, Class<?> clazz) {
+    protected ElementBinder bind(String name, Class<?> clazz) {
         return new ElementBinder(name, null, clazz).apply(it -> queues.add(it));
+    }
+
+    @Override
+    public void configure() {
+
     }
 
     protected void complete() {
@@ -45,7 +50,7 @@ public abstract class SimpleAbstractConfigurator implements Configurator {
                 ElementList<Object> elementList = storage.getSingletons().get(implementation);
                 if (elementList == null)
                     elementList = new SimpleElementList<>().apply(it -> storage.singletons.put(implementation, it));
-                elementList.add(queue.name, queue.clazz);
+                elementList.add(queue.name, queue.instance);
             }
         }
         queues.clear();
