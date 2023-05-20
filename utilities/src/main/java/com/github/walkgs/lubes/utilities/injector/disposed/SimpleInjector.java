@@ -42,8 +42,6 @@ public class SimpleInjector implements Injector {
 
         injectViaFields(instance, clazz);
 
-        //viaFields(instance, clazz)
-
         return injectViaMethods(instance, clazz);
     }
 
@@ -53,7 +51,8 @@ public class SimpleInjector implements Injector {
             return (T) clazz.newInstance();
         else {
             final Constructor<?> constructor = constructors.get(0);
-            return (T) constructor.newInstance(getParameterInstances(constructor.getParameterTypes(), constructor.getParameterAnnotations()));
+            final boolean singletonAll = constructor.isAnnotationPresent(Singleton.class);
+            return (T) constructor.newInstance(getParameterInstances(constructor.getParameterTypes(), constructor.getParameterAnnotations(), singletonAll));
         }
     }
 
@@ -66,22 +65,40 @@ public class SimpleInjector implements Injector {
     }
 
     public <T> void injectAtMethod(T instance, Method method) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        method.invoke(instance, getParameterInstances(method.getParameterTypes(), method.getParameterAnnotations()));
+        final boolean singletonAll = method.isAnnotationPresent(Singleton.class);
+        method.invoke(instance, getParameterInstances(method.getParameterTypes(), method.getParameterAnnotations(), singletonAll));
         method.setAccessible(false);
     }
 
+    @Override
     public <T> T injectViaFields(T instance, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        return injectViaFields(instance, clazz, false);
+    }
+
+    public <T> T injectViaFields(T instance, Class<T> clazz, boolean singletonAll) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         final Collection<Field> fields = Fields.findDeclared(clazz).filter(setAccessibleAndFilter()).sorted(PRIORITY_COMPARATOR).collect(Collectors.toList());
         for (Field field : fields) {
+            if (singletonAll) {
+                injectAtField(instance, field, true);
+                continue;
+            }
             injectAtField(instance, field);
         }
         return instance;
     }
 
     public <T> void injectAtField(T instance, Field field) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        //final Name annotation = field.getAnnotation(Name.class);
+        //final String name = annotation != null ? annotation.value() : Element.DEFAULT_NAME;
+        //field.set(instance, field.isAnnotationPresent(Singleton.class) ? getSingleton(name, field.getType()) : inject(syringe.getInjectable(name, field.getType())));
+        //field.setAccessible(false);
+        injectAtField(instance, field, field.isAnnotationPresent(Singleton.class));
+    }
+
+    public <T> void injectAtField(T instance, Field field, boolean singleton) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         final Name annotation = field.getAnnotation(Name.class);
         final String name = annotation != null ? annotation.value() : Element.DEFAULT_NAME;
-        field.set(instance, field.isAnnotationPresent(Singleton.class) ? getSingleton(name, field.getType()) : inject(syringe.getInjectable(name, field.getType())));
+        field.set(instance, singleton ? getSingleton(name, field.getType()) : inject(syringe.getInjectable(name, field.getType())));
         field.setAccessible(false);
     }
 
@@ -118,13 +135,13 @@ public class SimpleInjector implements Injector {
         return instance;
     }
 
-    private Object[] getParameterInstances(Class<?>[] types, Annotation[][] annotations) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    private Object[] getParameterInstances(Class<?>[] types, Annotation[][] annotations, boolean singletonAll) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         final Object[] arguments = new Object[types.length];
         int i = 0;
         for (Class<?> type : types) {
             final Name annotation = type.getAnnotation(Name.class);
             final String name = annotation != null ? annotation.value() : Element.DEFAULT_NAME;
-            final boolean isSingleton = containsSingleton(annotations != null ? annotations[i] : type.getAnnotations());
+            final boolean isSingleton = singletonAll || containsSingleton(annotations != null ? annotations[i] : type.getAnnotations());
             arguments[i] = isSingleton ? getSingleton(name, type) : inject(syringe.getInjectable(name, type));
             i++;
         }

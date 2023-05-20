@@ -19,7 +19,9 @@ public class CodeGenerator implements Applicable<CodeGenerator> {
 
     @Getter
     protected int seed = 1;
+    @Getter
     protected int code = 1;
+    @Getter
     protected int last = 1;
 
     @Getter
