@@ -12,12 +12,12 @@ import java.util.Date;
 @RequiredArgsConstructor
 public enum TimeUnit {
 
-    YEAR("yyyy", 31104000000L),
-    MONTH("MM",2592000000L),
-    DAY("dd",86400000),
-    HOUR("HH",3600000),
-    MINUTE("mm",60000),
-    SECOND("ss",1000),
+    YEAR("yyyy",  31104000000L),
+    MONTH("MM", 2592000000L),
+    DAY("dd", 86400000),
+    HOUR("HH", 3600000),
+    MINUTE("mm", 60000),
+    SECOND("ss", 1000),
     MILLISECOND("SSS", 1);
 
     private static final ZoneId DEFAULT_ZONE_ID = ZoneId.systemDefault();
@@ -34,7 +34,7 @@ public enum TimeUnit {
             final TimeUnit unit = units[index];
             time += Long.parseLong(values[index]) * (unit.base / base);
         }
-        return new SimpleMoment(zoneId, this, base, time);
+        return new SimpleMoment(zoneId, this, time);
     }
 
     public Moment now() {

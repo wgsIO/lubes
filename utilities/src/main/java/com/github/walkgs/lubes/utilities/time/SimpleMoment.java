@@ -1,6 +1,7 @@
 package com.github.walkgs.lubes.utilities.time;
 
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,13 +10,21 @@ import java.time.ZoneId;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SimpleMoment implements Moment {
 
     private final ZoneId zoneId;
     private final TimeUnit type;
-    private final long base;
     private long moment;
+
+    public static Moment of(ZoneId zoneId, TimeUnit type, long moment) {
+        return new SimpleMoment(zoneId, type, moment);
+    }
+
+    @Override
+    public long getBase() {
+        return type.getBase();
+    }
 
     @Override
     public void increment(long time) {

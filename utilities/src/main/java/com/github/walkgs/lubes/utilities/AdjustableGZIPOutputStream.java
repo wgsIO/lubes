@@ -6,7 +6,6 @@ import java.util.zip.GZIPOutputStream;
 
 public class AdjustableGZIPOutputStream extends GZIPOutputStream {
 
-
     public AdjustableGZIPOutputStream(OutputStream out, int size, int level) throws IOException {
         super(out, size);
         def.setLevel(level);

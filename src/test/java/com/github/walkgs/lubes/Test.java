@@ -1,6 +1,5 @@
 package com.github.walkgs.lubes;
 
-import com.github.walkgs.lubes.progressTest.ColoredBar;
 import com.github.walkgs.lubes.progressTest.ColoredWholeBar;
 import com.github.walkgs.lubes.progressTest.SimpleProgress;
 import com.github.walkgs.lubes.utilities.identifiers.CodeGenerator;
